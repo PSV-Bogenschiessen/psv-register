@@ -1,6 +1,6 @@
 Hallo {{first_name}},
 
-vielen Dank für deine Anmeldung zur Vereinsmeisterschaft Feld am 01.05.2023.
+vielen Dank für deine Anmeldung zur Vereinsmeisterschaft Feld am 01.05.2024.
 
 So hast du dich angemeldet:
 Name: {{first_name}} {{last_name}}
