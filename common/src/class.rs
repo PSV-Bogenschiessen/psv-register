@@ -16,6 +16,7 @@ pub enum Class {
     R11,
     R20,
     R30,
+    R40,
     R12,
     B210,
     B211,
@@ -37,6 +38,7 @@ impl Class {
             Class::R11 => "Recurve Damen",
             Class::R20 => "Recurve Schüler m/w",
             Class::R30 => "Recurve Jugend m/w",
+            Class::R40 => "Recurve Junioren m/w",
             Class::R12 => "Recurve Master m",
             Class::B210 => "Blank Herren",
             Class::B211 => "Blank Damen",
@@ -66,6 +68,7 @@ impl Class {
             Self::R11,
             Self::R20,
             Self::R30,
+            Self::R40,
             Self::R12,
             Self::OO,
         ]
@@ -92,10 +95,11 @@ impl Class {
     }
     pub fn in_range(&self, dob: NaiveDate) -> bool {
         let year_range = match self {
-            Class::R10 => (18, 49),
-            Class::R11 => (18, 120),
+            Class::R10 => (21, 49),
+            Class::R11 => (21, 120),
             Class::R20 => (1, 14),
             Class::R30 => (15, 17),
+            Class::R40 => (18, 20),
             Class::R12 => (50, 120),
             Class::C110 => (18, 49),
             Class::C111 => (18, 120),
@@ -153,6 +157,6 @@ impl Display for UnknownClassError {
 fn test_in_range() {
     assert!(!Class::R10.in_range(NaiveDate::from_ymd_opt(1974, 12, 31).unwrap()));
     assert!(Class::R10.in_range(NaiveDate::from_ymd_opt(1975, 1, 1).unwrap()));
-    assert!(Class::R10.in_range(NaiveDate::from_ymd_opt(2006, 12, 31).unwrap()));
-    assert!(!Class::R10.in_range(NaiveDate::from_ymd_opt(2007, 1, 1).unwrap()));
+    assert!(Class::R10.in_range(NaiveDate::from_ymd_opt(2003, 12, 31).unwrap()));
+    assert!(!Class::R10.in_range(NaiveDate::from_ymd_opt(2004, 1, 1).unwrap()));
 }

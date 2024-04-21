@@ -17,7 +17,7 @@ impl TargetFace {
             B230 => &[Yellow],
             R30 | C130 => &[Blue],
             B210 | B211 | B212 => &[Blue],
-            R10 | R11 | R12 | C110 | C111 | C112 => &[Red],
+            R10 | R11 | R12 | R40 | C110 | C111 | C112 => &[Red],
             OO => &[Yellow],
         }
     }
