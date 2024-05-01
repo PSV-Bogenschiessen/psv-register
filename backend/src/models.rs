@@ -57,4 +57,5 @@ pub struct ArcherAdditions {
     pub bib: i32,
     pub email: String,
     pub comment: String,
+    pub target_face: String,
 }

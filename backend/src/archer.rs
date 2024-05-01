@@ -42,7 +42,6 @@ pub async fn list_archers() -> Result<impl IntoResponse> {
 fn save_archer(archer: Archer) -> Result<()> {
     let mut connection = crate::db::establish_connection();
     connection.transaction(|conn| -> Result<()> {
-        use Class::*;
         let inserted_bib: i32 = diesel::insert_into(schema::archers::table)
             .values(crate::models::InsertableArcher {
                 division: match archer.class() {
@@ -51,30 +50,7 @@ fn save_archer(archer: Archer) -> Result<()> {
                     c if Class::compound_classes().contains(&c) => "C".to_string(),
                     _ => unreachable!(),
                 },
-                class: match archer.class() {
-                    R10 | B210 | C110 => "M",
-                    R11 | B211 | C111 => "W",
-                    R20 => "U15M",
-                    R21 => "U15W",
-                    R22 => "U13M",
-                    R23 => "U13W",
-                    R24 => "U11M",
-                    R25 => "U11W",
-                    R30 => "U18M",
-                    R31 => "U18W",
-                    R40 => "U21M",
-                    R41 => "U21W",
-                    R12 | B212 | C112 => "Ü49M",
-                    R13 | C113 => "Ü49W",
-                    R14 | C114 => "Ü65M",
-                    R15 => "Ü65W",
-                    B220 | C120 => "U15",
-                    C130 => "U18",
-                    B230 | C140 => "U21",
-                    O => "O",
-                }
-                .into(),
-                target: format!("{:?}", archer.target_face()),
+                class: format!("{:?}", archer.class()),
                 individual_qualification: 1,
                 team_qualification: 1,
                 individual_final: 1,
@@ -95,6 +71,7 @@ fn save_archer(archer: Archer) -> Result<()> {
             .values(crate::models::ArcherAdditions {
                 bib: inserted_bib,
                 email: archer.mail.as_str().to_owned(),
+                target_face: format!("{:?}", archer.target_face()),
                 comment: archer.comment,
             })
             .execute(conn)?;
