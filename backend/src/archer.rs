@@ -52,7 +52,6 @@ fn save_archer(archer: Archer) -> Result<()> {
                     _ => unreachable!(),
                 },
                 class: format!("{:?}", archer.class()),
-                target: format!("{:?}", archer.target_face()),
                 individual_qualification: 1,
                 team_qualification: 1,
                 individual_final: 1,
@@ -73,6 +72,7 @@ fn save_archer(archer: Archer) -> Result<()> {
             .values(crate::models::ArcherAdditions {
                 bib: inserted_bib,
                 email: archer.mail.as_str().to_owned(),
+                target_face: format!("{:?}", archer.target_face()),
                 comment: archer.comment,
             })
             .execute(conn)?;

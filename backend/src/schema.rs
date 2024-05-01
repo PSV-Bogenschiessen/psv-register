@@ -5,6 +5,8 @@ diesel::table! {
         bib -> Integer,
         email -> Nullable<Text>,
         comment -> Nullable<Text>,
+        #[sql_name = "target face"]
+        target_face -> Nullable<Text>,
     }
 }
 
@@ -48,4 +50,7 @@ diesel::table! {
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(archer_additions, archers,);
+diesel::allow_tables_to_appear_in_same_query!(
+    archer_additions,
+    archers,
+);
