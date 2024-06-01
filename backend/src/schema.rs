@@ -2,7 +2,7 @@
 
 diesel::table! {
     archer_additions (bib) {
-        bib -> Integer,
+        bib -> BigInt,
         email -> Nullable<Text>,
         comment -> Nullable<Text>,
         #[sql_name = "target face"]
@@ -12,7 +12,7 @@ diesel::table! {
 
 diesel::table! {
     archers (bib) {
-        bib -> Integer,
+        bib -> BigInt,
         session -> Integer,
         division -> Text,
         class -> Text,
@@ -50,7 +50,6 @@ diesel::table! {
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(
-    archer_additions,
-    archers,
-);
+diesel::joinable!(archer_additions -> archers (bib));
+
+diesel::allow_tables_to_appear_in_same_query!(archer_additions, archers,);

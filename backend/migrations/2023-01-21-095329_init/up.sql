@@ -23,7 +23,7 @@ CREATE TABLE "archers" (
 	PRIMARY KEY("bib" AUTOINCREMENT)
 );
 CREATE TABLE "archer_additions" (
-	"bib"	INTEGER NOT NULL,
+	"bib"	INTEGER NOT NULL REFERENCES archers(bib),
 	"email"	TEXT,
 	"comment"	TEXT,
 	PRIMARY KEY("bib")

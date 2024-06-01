@@ -3,5 +3,6 @@
 members = [
   "frontend",
   "backend",
-  "common"
+  "common",
+  "post_process",
 ]

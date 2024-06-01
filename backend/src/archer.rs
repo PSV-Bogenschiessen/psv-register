@@ -42,7 +42,7 @@ pub async fn list_archers() -> Result<impl IntoResponse> {
 fn save_archer(archer: Archer) -> Result<()> {
     let mut connection = crate::db::establish_connection();
     connection.transaction(|conn| -> Result<()> {
-        let inserted_bib: i32 = diesel::insert_into(schema::archers::table)
+        let inserted_bib: i64 = diesel::insert_into(schema::archers::table)
             .values(crate::models::InsertableArcher {
                 session: 1,
                 division: match archer.class() {
@@ -70,9 +70,9 @@ fn save_archer(archer: Archer) -> Result<()> {
         diesel::insert_into(schema::archer_additions::table)
             .values(crate::models::ArcherAdditions {
                 bib: inserted_bib,
-                email: archer.mail.as_str().to_owned(),
-                target_face: format!("{:?}", archer.target_face()),
-                comment: archer.comment,
+                email: Some(archer.mail.as_str().to_owned()),
+                target_face: Some(format!("{:?}", archer.target_face())),
+                comment: Some(archer.comment),
             })
             .execute(conn)?;
 
