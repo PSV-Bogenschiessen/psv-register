@@ -9,6 +9,7 @@ use std::path::PathBuf;
 use clap::Parser;
 use diesel::prelude::*;
 use diesel::Connection;
+use rand::prelude::*;
 
 #[derive(clap::Parser)]
 struct CliArgs {
@@ -29,6 +30,10 @@ struct CliArgs {
     /// Target face ids
     #[arg(long)]
     target_face_ids: PathBuf,
+
+    /// Asign target
+    #[arg(long)]
+    assign_targets: bool,
 }
 
 #[tokio::main]
@@ -37,6 +42,7 @@ async fn main() {
         db_file,
         zmi_file,
         target_face_ids,
+        assign_targets,
     } = CliArgs::parse();
     let target_face_to_id = read_target_face_ids(&target_face_ids);
 
@@ -74,6 +80,33 @@ async fn main() {
         .has_headers(false)
         .from_writer(std::io::stdout());
 
+    if assign_targets {
+        archer_with_additions.shuffle(&mut rand::rngs::StdRng::seed_from_u64(42));
+        archer_with_additions
+            .sort_by_key(|&(ref ar, ref ad)| (ad.target_face.clone(), ar.class.clone()));
+
+        archer_with_additions
+            .iter_mut()
+            .fold((3, (None, String::new())), |mut acc, (ar, ad)| {
+                if acc.1 != (ad.target_face.clone(), ar.class.clone()) {
+                    // new target
+                    acc.0 = ((acc.0 / 4) + 1) * 4;
+                } else {
+                    // just move one up
+                    acc.0 += 1;
+                }
+                acc.1 = (ad.target_face.clone(), ar.class.clone());
+                let c = match acc.0 % 4 {
+                    0 => 'A',
+                    1 => 'B',
+                    2 => 'C',
+                    3 => 'D',
+                    _ => unreachable!(),
+                };
+                ar.target = format!("{}{}", acc.0 / 4, c);
+                acc
+            });
+    }
     for (arch, _) in &mut archer_with_additions {
         arch.first_name = arch.first_name.trim().to_string();
         arch.last_name = arch.last_name.trim().to_string();

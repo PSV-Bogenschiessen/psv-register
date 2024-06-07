@@ -1563,6 +1563,7 @@ dependencies = [
  "diesel",
  "encoding_rs",
  "encoding_rs_io",
+ "rand",
  "serde",
  "tokio",
 ]
