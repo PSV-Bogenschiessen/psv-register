@@ -1,1 +1,1 @@
-/Users/thomas/src/rust/psv-register/backend/src/schema.rs
+../../backend/src/schema.rs
