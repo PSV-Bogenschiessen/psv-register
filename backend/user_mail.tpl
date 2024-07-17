@@ -1,6 +1,6 @@
 Hallo {{first_name}},
 
-vielen Dank für deine Anmeldung zur Vereinsmeisterschaft WA am 09.06.2024.
+vielen Dank für deine Anmeldung zum PSV Cup am 26.09.2024.
 
 So hast du dich angemeldet:
 Name: {{first_name}} {{last_name}}

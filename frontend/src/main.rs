@@ -29,7 +29,7 @@ thread_local! {
 impl Model {
     fn new() -> Self {
         let date = NaiveDate::default();
-        let cls = Class::classes_for(date, BowType::Recurve)[0];
+        let cls = Class::classes_for(date)[0];
         Model {
             first_name: String::new(),
             last_name: String::new(),
@@ -44,15 +44,9 @@ impl Model {
         }
     }
     fn check_and_update_cls(&mut self, orders: &mut impl Orders<Msg>) {
-        let available_classes: Vec<Class> = match self.bow_type {
-            BowType::Recurve => Class::recurve_classes(),
-            BowType::Compound => Class::compound_classes(),
-            BowType::Barebow => Class::barebow_classes(),
-        }
-        .iter()
-        .filter(|cls| cls.in_range(self.date_of_birth))
-        .copied()
-        .collect();
+        let available_classes: Vec<Class> = Class::all_classes()
+            .filter(|cls| cls.in_range(self.date_of_birth))
+            .collect();
 
         let new_cls = match (self.cls, available_classes.get(0)) {
             (Some(cls), Some(&new)) => {
@@ -84,7 +78,7 @@ impl Model {
             self.selected_target_face = *self
                 .possible_target_faces
                 .get(0)
-                .unwrap_or(&TargetFace::M70cm122);
+                .unwrap_or(&TargetFace::M60cm122);
         }
     }
 }
@@ -239,7 +233,6 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 
 fn view(model: &Model) -> Node<Msg> {
     let dob = model.date_of_birth;
-    let bow_type = model.bow_type;
     ul![
         C!("main"),
         li!("Vorname:"),
@@ -265,85 +258,42 @@ fn view(model: &Model) -> Node<Msg> {
             input_ev(Ev::Input, Msg::DateOfBirthChanged)
         )),
         li!(br!()),
-        li!("Bogenart:"),
-        li!(
-            input!(
-                attrs!(At::Type => "radio", At::Name => "bow_type", At::Id => "recurve"),
-                if model.bow_type.is_recurve() {
-                    Some(attrs!("checked" => AtValue::None))
-                } else {
-                    None
-                },
-                input_ev(Ev::Input, |_| Msg::BowTypeChange(BowType::Recurve))
-            ),
-            label!("Recurve", attrs!(At::For => "recurve")),
-            input!(
-                attrs!(At::Type => "radio", At::Name => "bow_type", At::Id => "blank"),
-                if model.bow_type.is_barebow() {
-                    Some(attrs!("checked" => AtValue::None))
-                } else {
-                    None
-                },
-                input_ev(Ev::Input, |_| Msg::BowTypeChange(BowType::Barebow))
-            ),
-            label!("Blank", attrs!(At::For => "blank")),
-            input!(
-                attrs!(At::Type => "radio", At::Name => "bow_type", At::Id => "compound", ),
-                if model.bow_type.is_compound() {
-                    Some(attrs!("checked" => AtValue::None))
-                } else {
-                    None
-                },
-                input_ev(Ev::Input, |_| Msg::BowTypeChange(BowType::Compound))
-            ),
-            label!("Compound", attrs!(At::For => "compound"))
-        ),
-        li!(em!(match model.bow_type {
-            BowType::Recurve => "Der Recurve-Bogen ist am weitesten verbreitet. Er hat ein Visier und optional ein Stabilisationssystem und einen Klicker",
-            BowType::Compound => "Der Compound-Bogen ist einfach zu erkennen an den Rollen am oberen und unteren Ende, welche das Haltegewicht im Vollauszug reduzieren.",
-            BowType::Barebow => "Der Blank-Bogen ist der einfachste Bogen. Hier ist kein Visier erlaubt. Auch andere Anbauten sind stark reglementiert.",
-        })),
-        li!(br!()),
         li!("Klasse:"),
         li!(
             attrs!(At::Name => "cls"),
             select!(
                 attrs!(At::Name => "Class",At::AutoComplete => "off", At::Required => AtValue::None),
                 model.cls.map(|cls| attrs!(At::Value => cls.name())),
-                match model.bow_type {
-                    BowType::Recurve => Class::recurve_classes(),
-                    BowType::Compound => Class::compound_classes(),
-                    BowType::Barebow => Class::barebow_classes(),
-                }
-                .iter()
-                .filter(|cls| cls.in_range(model.date_of_birth))
-                .map(|cls| option!(
-                    cls.name(),
-                    attrs!(At::Value => cls.name()),
-                    IF!(Some(*cls) == model.cls => attrs!(At::Selected => AtValue::None)),
-                    ev(Ev::Input, |_| { Msg::ClassChanged(Some(*cls)) })
-                ))
-                .collect::<Vec<_>>(),
+                Class::all_classes()
+                    .filter(|cls| cls.in_range(model.date_of_birth))
+                    .map(|cls| option!(
+                        cls.name(),
+                        attrs!(At::Value => cls.name()),
+                        IF!(Some(cls) == model.cls => attrs!(At::Selected => AtValue::None)),
+                        ev(Ev::Input, move |_| { Msg::ClassChanged(Some(cls)) })
+                    ))
+                    .collect::<Vec<_>>(),
                 input_ev(Ev::Input, move |cls_name| {
-                    Msg::ClassChanged(
-                        Some(Class::classes_for(dob, bow_type)
+                    Msg::ClassChanged(Some(
+                        Class::classes_for(dob)
                             .into_iter()
                             .find(|cls| cls.name() == cls_name)
-                            .unwrap()),
-                    )
+                            .unwrap(),
+                    ))
                 })
             )
         ),
         li!(em!(model.cls.map(|cls| cls.comment()))),
         li!(br!()),
         li!("Scheibe:"),
-        li!(
-            model.possible_target_faces.iter().map(|&tf| div![
-                input!(attrs!(At::Type => "radio", At::Name => "target_face", At::Id => format!("{}", tf)), IF!(model.selected_target_face == tf => attrs!(At::Checked => AtValue::None)),input_ev(Ev::Input, move |_| Msg::TargetFaceChanged(tf))),
-                label!(format!("{}", tf), attrs!(At::For => format!("{}", tf)))
-            ]),
-
-        ),
+        li!(model.possible_target_faces.iter().map(|&tf| div![
+            input!(
+                attrs!(At::Type => "radio", At::Name => "target_face", At::Id => format!("{}", tf)),
+                IF!(model.selected_target_face == tf => attrs!(At::Checked => AtValue::None)),
+                input_ev(Ev::Input, move |_| Msg::TargetFaceChanged(tf))
+            ),
+            label!(format!("{}", tf), attrs!(At::For => format!("{}", tf)))
+        ]),),
         li!(br!()),
         li!("Kommentar:"),
         li!(textarea!(

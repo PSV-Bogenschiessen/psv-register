@@ -46,10 +46,8 @@ fn save_archer(archer: Archer) -> Result<()> {
             .values(crate::models::InsertableArcher {
                 session: 1,
                 division: match archer.class() {
-                    c if Class::recurve_classes().contains(&c) => "R".to_string(),
-                    c if Class::barebow_classes().contains(&c) => "B".to_string(),
-                    c if Class::compound_classes().contains(&c) => "C".to_string(),
-                    _ => unreachable!(),
+                    Class::CC => "C".to_string(),
+                    _ => "R".to_string(),
                 },
                 class: format!("{:?}", archer.class()),
                 individual_qualification: 1,
