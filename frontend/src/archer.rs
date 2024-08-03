@@ -12,10 +12,34 @@ use serde::{Deserialize, Serialize};
 use crate::Msg;
 
 #[derive(Serialize, Deserialize)]
+pub enum DoB {
+    Vaild(NaiveDate),
+    Invalid(String),
+}
+
+impl DoB {
+    fn is_valid(&self) -> bool {
+        match self {
+            DoB::Vaild(_) => true,
+            DoB::Invalid(_) => false,
+        }
+    }
+}
+
+impl std::fmt::Display for DoB {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Vaild(dob) => dob.fmt(f),
+            Self::Invalid(dob) => dob.fmt(f),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct ArcherModel {
     pub first_name: String,
     pub last_name: String,
-    pub date_of_birth: NaiveDate,
+    pub date_of_birth: DoB,
     pub bow_type: BowType,
     pub cls: Option<Class>,
 
@@ -41,10 +65,13 @@ impl ArcherModel {
         }
     }
     pub fn check_and_update_cls(&mut self, index: usize, orders: &mut impl Orders<Msg>) {
-        let available_classes = Class::allowed_classes(self.bow_type, self.date_of_birth)
-            .into_iter()
-            .map(|(cls, _)| cls)
-            .collect::<Vec<_>>();
+        let available_classes = match self.date_of_birth {
+            DoB::Vaild(dob) => Class::allowed_classes(self.bow_type, dob)
+                .into_iter()
+                .map(|(cls, _)| cls)
+                .collect::<Vec<_>>(),
+            DoB::Invalid(_) => Vec::new(),
+        };
 
         let new_cls = match (self.cls, available_classes.get(0)) {
             (Some(cls), Some(&new)) => {
@@ -65,7 +92,9 @@ impl ArcherModel {
     }
 
     pub fn ready_for_submission(&self) -> bool {
-        !self.first_name.is_empty().bitxor(self.last_name.is_empty()) && self.cls.is_some()
+        !self.first_name.is_empty().bitxor(self.last_name.is_empty())
+            && self.cls.is_some()
+            && self.date_of_birth.is_valid()
     }
 }
 impl Default for ArcherModel {
@@ -75,7 +104,7 @@ impl Default for ArcherModel {
         Self {
             first_name: String::new(),
             last_name: String::new(),
-            date_of_birth: date,
+            date_of_birth: DoB::Vaild(date),
             bow_type: BowType::Recurve,
             cls: Some(cls),
             possible_target_faces: TargetFace::for_cls(cls).to_owned(),
@@ -94,9 +123,13 @@ pub enum ArcherMsg {
 }
 
 pub fn archer_view(model: &ArcherModel, index: usize) -> Node<Msg> {
-    let dob = model.date_of_birth;
+    let dob = &model.date_of_birth;
     let bow_type = model.bow_type;
-    let allowed_classes = Class::allowed_classes(bow_type, dob);
+    let allowed_classes = match dob {
+        DoB::Vaild(dob) => Class::allowed_classes(bow_type, *dob),
+        DoB::Invalid(_) => Vec::new(),
+    };
+
     p![
         C!("archer"),
         ul!(
@@ -134,7 +167,11 @@ pub fn archer_view(model: &ArcherModel, index: usize) -> Node<Msg> {
         )),
         li!("Geburtsdatum:"),
         li!(input!(
-            attrs!(At::Value => model.date_of_birth, At::Type => "date" ),
+            attrs!(
+                At::Value => model.date_of_birth,
+                At::Type => "date",
+                At::Style =>if !model.date_of_birth.is_valid() {"border: 1px solid red"} else {""}
+            ),
             input_ev(Ev::Input, move |s| Msg::ArcherMsg(
                 index,
                 ArcherMsg::DateOfBirthChanged(s)
@@ -244,10 +281,10 @@ pub fn update_archer(
         LastNameChanged(n) => model.last_name = n,
         DateOfBirthChanged(dob) => {
             model.date_of_birth = match chrono::NaiveDate::parse_from_str(&dob, "%Y-%m-%d") {
-                Ok(valid) => valid,
+                Ok(valid) => DoB::Vaild(valid),
                 Err(e) => {
                     seed::error!("Date of birth is not valid:", e);
-                    Default::default()
+                    DoB::Invalid(dob)
                 }
             };
             model.check_and_update_cls(index, orders);

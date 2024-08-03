@@ -138,7 +138,12 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
                             a.first_name.clone(),
                             a.last_name.clone(),
                             mail.clone(),
-                            a.date_of_birth,
+                            match a.date_of_birth {
+                                archer::DoB::Vaild(dob) => dob,
+                                archer::DoB::Invalid(_) => {
+                                    unreachable!("Submission only impossible if dob is valid")
+                                }
+                            },
                             a.cls.expect("Submission only possible if class is set"),
                             a.selected_target_face,
                             model.registrator.comment.clone(),
