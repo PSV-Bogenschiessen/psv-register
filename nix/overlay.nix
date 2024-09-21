@@ -9,7 +9,7 @@
     cargoDeps = old.cargoDeps.overrideAttrs (_: {
       src =  final.wasm-bindgen-cli.src; # You need to pass "src" here again,
                                          # otherwise the old "src" will be used.
-      outputHash = "sha256-AsZBtE2qHJqQtuCt/wCAgOoxYMfvDh8IzBPAOkYSYko";
+      outputHash = "sha256-OrO9erE3Md8tbz0VUvFPR7oaSxYTEG0jLWScs4nNBvs=";
     });
   });
   trunk = prev.trunk.overrideAttrs (old: {
@@ -23,7 +23,7 @@
     cargoDeps = old.cargoDeps.overrideAttrs (_: {
       src =  final.trunk.src; # You need to pass "src" here again,
                               # otherwise the old "src" will be used.
-      outputHash = "sha256-CPwestYkqG6TaFsM99GVcbfGJNbdO9IphazZQwmt93g";
+      outputHash = "sha256-DxRf2JG6HsgqbK1In2HRaotel1UYj6dMtULTHk66/Ws=";
     });
   });
 })
