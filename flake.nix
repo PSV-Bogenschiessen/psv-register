@@ -24,7 +24,7 @@
               extensions = [ "rust-src" ];
               targets = [
                 "wasm32-unknown-unknown"
-                (pkgs.rust.toRustTargetSpec pkgs.stdenv.hostPlatform)
+                pkgs.stdenv.hostPlatform.rust.rustcTargetSpec
               ];
             })
             pkgs.rust-analyzer

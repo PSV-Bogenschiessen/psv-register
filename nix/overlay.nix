@@ -1,15 +1,15 @@
 (final: prev: {
   wasm-bindgen-cli = prev.wasm-bindgen-cli.overrideAttrs (old: {
-    version = "0.2.87";
+    version = "0.2.93";
     src = prev.fetchCrate {
       pname = "wasm-bindgen-cli";
       version = final.wasm-bindgen-cli.version;
-      sha256 = "sha256-0u9bl+FkXEK2b54n7/l9JOCtKo+pb42GF9E1EnAUQa0=";
+      sha256 = "sha256-DDdu5mM3gneraM85pAepBXWn3TMofarVR4NbjMdz3r0=";
     };
     cargoDeps = old.cargoDeps.overrideAttrs (_: {
       src =  final.wasm-bindgen-cli.src; # You need to pass "src" here again,
                                          # otherwise the old "src" will be used.
-      outputHash = "sha256-OrO9erE3Md8tbz0VUvFPR7oaSxYTEG0jLWScs4nNBvs=";
+      outputHash = "sha256-birrg+XABBHHKJxfTKAMSlmTVYLmnmqMDfRnmG6g/YQ=";
     });
   });
   trunk = prev.trunk.overrideAttrs (old: {
