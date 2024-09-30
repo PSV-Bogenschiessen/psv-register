@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
 lazy_static! {
-    pub static ref SEASON_START: NaiveDate = NaiveDate::from_ymd_opt(2024, 1, 1).unwrap();
+    pub static ref SEASON_START: NaiveDate = NaiveDate::from_ymd_opt(2025, 1, 1).unwrap();
 }
 
 #[derive(
@@ -240,8 +240,8 @@ impl Display for UnknownClassError {
 
 #[test]
 fn test_in_range() {
-    assert!(!Class::R10.in_range(NaiveDate::from_ymd_opt(1974, 12, 31).unwrap()));
-    assert!(Class::R10.in_range(NaiveDate::from_ymd_opt(1975, 1, 1).unwrap()));
-    assert!(Class::R10.in_range(NaiveDate::from_ymd_opt(2003, 12, 31).unwrap()));
-    assert!(!Class::R10.in_range(NaiveDate::from_ymd_opt(2004, 1, 1).unwrap()));
+    assert!(!Class::R10.in_range(NaiveDate::from_ymd_opt(1975, 12, 31).unwrap()));
+    assert!(Class::R10.in_range(NaiveDate::from_ymd_opt(1976, 1, 1).unwrap()));
+    assert!(Class::R10.in_range(NaiveDate::from_ymd_opt(2004, 12, 31).unwrap()));
+    assert!(!Class::R10.in_range(NaiveDate::from_ymd_opt(2005, 1, 1).unwrap()));
 }

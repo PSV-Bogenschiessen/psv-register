@@ -1,6 +1,6 @@
 Hallo {{name}},
 
-vielen Dank für die Meldung zur Vereinsmeisterschaft Halle am 26.11.2023.
+vielen Dank für die Meldung zur Vereinsmeisterschaft Halle am 1.12.2024.
 
 angegebener Kommentar:
 {{comment}}
