@@ -38,10 +38,6 @@ struct CliArgs {
     #[arg(long)]
     database_file: Option<String>,
 
-    /// Path to email template
-    #[arg(long, default_value_t = String::from("user_mail.tpl"))]
-    mail_template_file: String,
-
     /// Path to email password file.
     /// Overwrites password from config
     #[arg(long)]

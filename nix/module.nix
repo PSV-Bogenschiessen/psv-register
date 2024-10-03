@@ -71,7 +71,6 @@ in
       serviceConfig.ExecStart = ''
         ${service-pkg}/bin/backend \
         --config-file ${cfg_file} \
-        --mail-template-file ${../backend/user_mail.tpl} \
         --database-file ${cfg.database-location} \
         --mail-password-file ${cfg.smtp-password-file}
       '';
