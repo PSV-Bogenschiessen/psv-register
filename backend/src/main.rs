@@ -1,6 +1,7 @@
 use axum::{
     body::{boxed, Body, BoxBody},
     http::{Request, Response, StatusCode, Uri},
+    response::AppendHeaders,
     routing::{get, post},
     Router,
 };
@@ -88,7 +89,15 @@ async fn main() {
         .route("/archers", post(archer::create_archers))
         .route("/archers", get(archer::list_archers));
     let app = Router::new()
-        .nest_service("/", get(handler))
+        .nest_service(
+            "/",
+            get(handler).then(|res| async move {
+                Ok((
+                    AppendHeaders([(axum::http::header::CACHE_CONTROL, "no-cache")]),
+                    res,
+                ))
+            }),
+        )
         .nest_service("/api", api);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], CONFIG.read().port));
