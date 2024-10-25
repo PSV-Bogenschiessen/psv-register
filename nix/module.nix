@@ -30,12 +30,12 @@ in
         default = ["psv.register.com"];
       };
     };
-    smtp-password-file = mkOption {
-      type = types.str;
+    config_files = mkOption {
+      type = types.listOf types.str;
       example = "/etc/passwords/smtp.password";
       default = "";
       description = ''
-        Path to a file containing the password. This overwrites the password given in the settings.
+        Path to files containing config you don't want in the nix store like the password. This overwrites the password given in the settings.
         This option is mandatory because you shouldn't put the real password into the nix store (settings of this module).
       '';
     };
@@ -71,8 +71,8 @@ in
       serviceConfig.ExecStart = ''
         ${service-pkg}/bin/backend \
         --config-file ${cfg_file} \
-        --database-file ${cfg.database-location} \
-        --mail-password-file ${cfg.smtp-password-file}
+        ${ concatStringsSep " " (map (p: "--config-file ${p}") cfg.config_files) }
+        --database-path ${cfg.database-location}
       '';
     };
 
