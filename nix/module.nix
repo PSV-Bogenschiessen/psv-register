@@ -71,7 +71,7 @@ in
       serviceConfig.ExecStart = ''
         ${service-pkg}/bin/backend \
         --config-file ${cfg_file} \
-        ${ concatStringsSep " " (map (p: "--config-file ${p}") cfg.config_files) }
+        ${ concatStringsSep " " (map (p: "--config-file ${p}") cfg.config_files) } \
         --database-path ${cfg.database-location}
       '';
     };
