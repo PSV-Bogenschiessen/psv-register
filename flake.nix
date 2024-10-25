@@ -49,6 +49,11 @@
           frontend = import nix/frontend.nix { inherit pkgs; };
           backend = import nix/backend.nix { inherit pkgs frontend; };
           default = backend;
+          container = pkgs.dockerTools.buildImage {
+            name = "psv-registration-indoor";
+            config.Cmd = ["${backend}/bin/backend"];
+            tag = "latest";
+          };
         };
 
         formatter = pkgs.nixpkgs-fmt;
