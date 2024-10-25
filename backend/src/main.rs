@@ -8,10 +8,14 @@ use axum::{
 use clap::Parser;
 use config::Config;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use figment::{
+    providers::{Env, Format, Serialized, Toml},
+    Figment,
+};
 use handlebars::Handlebars;
 use lazy_static::lazy_static;
 use static_init::dynamic;
-use std::{net::SocketAddr, path::PathBuf};
+use std::net::SocketAddr;
 use tower::ServiceExt;
 use tower_http::services::ServeDir;
 
@@ -32,52 +36,37 @@ pub static mut HANDLEBARS: Handlebars<'static> = {
     hlbs
 };
 
-#[derive(Parser, Debug)]
-struct CliArgs {
-    /// Path to config file
-    #[arg(long, default_value_t = String::from("config.toml"))]
-    config_file: String,
-
-    /// Path to database file. Overwrites environment variable
-    #[arg(long)]
-    database_file: Option<String>,
-
-    /// Path to email password file.
-    /// Overwrites password from config
-    #[arg(long)]
-    mail_password_file: Option<PathBuf>,
-}
-
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 #[tokio::main]
 async fn main() {
     env_logger::init();
-    let args = CliArgs::parse();
-    if let Some(db_file) = args.database_file {
-        std::env::set_var("DATABASE_URL", db_file);
+
+    let args = config::CliConfig::parse();
+    let mut figment = Figment::new().merge(Toml::file("config.toml")); // TODO add some sane default directories
+    for config in &args.config_file {
+        figment = figment.merge(Toml::file(config));
     }
-    db::establish_connection()
+    let config: Config = figment
+        .merge(Env::prefixed("PSV_"))
+        .merge(Serialized::defaults(args))
+        .extract()
+        .unwrap_or_else(|e| {
+            eprintln!("Could not aggregate correct configuration!");
+            eprintln!("{e}");
+            std::process::exit(1)
+        });
+    *CONFIG.write() = config;
+
+    db::establish_connection(&CONFIG.read().database_path)
         .run_pending_migrations(MIGRATIONS)
         .expect("Could not migrate database");
-
-    *CONFIG.write() = {
-        let mut config = load_config(&std::path::PathBuf::from(&args.config_file));
-        if let Some(pswd) = args.mail_password_file {
-            config.mail_server.smtp_password =
-                std::fs::read_to_string(pswd).expect("Password file couldn't be read");
-        }
-        config
-    };
     {
         let mut handlebars = HANDLEBARS.write();
         // handlebars.set_strict_mode(true);
         handlebars.set_dev_mode(cfg!(debug_assertions));
         handlebars
-            .register_template_file(
-                "user_mail",
-                std::path::PathBuf::from(args.mail_template_file),
-            )
+            .register_template_string("user_mail", include_str!("../user_mail.tpl"))
             .unwrap();
     }
 
@@ -135,10 +124,4 @@ async fn get_static_file(uri: Uri) -> Result<Response<BoxBody>, (StatusCode, Str
             format!("Something went wrong: {}", err),
         )),
     }
-}
-
-fn load_config(path: &std::path::Path) -> Config {
-    let toml_config = std::fs::read_to_string(path)
-        .unwrap_or_else(|_| panic!("Couldn't read file from path {:?}", path));
-    toml::from_str(&toml_config).expect("Couldn't parse config content!")
 }
