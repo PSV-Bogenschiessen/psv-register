@@ -50,9 +50,9 @@
           backend = import nix/backend.nix { inherit pkgs frontend; };
           default = backend;
           container = pkgs.dockerTools.buildImage {
-            name = "psv-registration-indoor";
-            config.Cmd = ["${backend}/bin/backend"];
+            name = "ghcr.io/PSV-Bogenschiessen/psv-register-halle";
             tag = "latest";
+            config.Cmd = ["${backend}/bin/backend"];
           };
         };
 
