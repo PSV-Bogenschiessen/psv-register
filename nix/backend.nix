@@ -12,11 +12,11 @@ pkgs.rustPlatform.buildRustPackage {
   ];
   name = "psv-register";
   src = ./..;
-  srcRoot = ../backend;
+  cargoBuildFlags = "-p backend";
   cargoLock.lockFile = ../Cargo.lock;
   postFixup = ''
     wrapProgram $out/bin/backend \
       --set WEBPAGE ${frontend}/web
-    ln $out/bin/backend $out/bin/psv-register
+    ln -s $out/bin/backend $out/bin/psv-register
   '';
 }
