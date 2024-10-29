@@ -48,7 +48,7 @@ async fn main() {
         figment = figment.merge(Toml::file(config));
     }
     let config: Config = figment
-        .merge(Env::prefixed("PSV_"))
+        .merge(Env::prefixed("PSV_").split("__"))
         .merge(Serialized::defaults(args))
         .extract()
         .unwrap_or_else(|e| {
