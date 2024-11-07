@@ -180,8 +180,7 @@ impl Class {
 
         let upgrade_classes = default_classes
             .clone()
-            .map(|dc| dc.other_allowed_classes().into_iter())
-            .flatten()
+            .flat_map(|dc| dc.other_allowed_classes().iter())
             .unique();
         default_classes
             .map(|&c| (c, ClassUpgradeStatus::InDefaultAgeRange))

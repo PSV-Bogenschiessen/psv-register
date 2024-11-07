@@ -25,7 +25,7 @@ pub async fn create_archers(
     let save_task = tokio::task::spawn_blocking(move || {
         archers
             .into_iter()
-            .map(|archer| save_archer(archer))
+            .map(save_archer)
             .collect::<Result<Vec<()>>>()
     });
     let (save, mail) = tokio::join!(save_task, send_registration_mail(mail_data));
