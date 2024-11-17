@@ -174,7 +174,7 @@ impl From<&common::archer::Archer> for EmailArcher {
                 R10 | R11 | R20 | R21 | R22 | R23 | R24 | R25 | R30 | R31 | R40 | R41 | R12
                 | R13 | R14 | R15 | O => "Recurve",
 
-                B210 | B211 | B220 | B230 | B212 => "Blank",
+                B210 | B211 | B220 | B230 | B212 | B213 | B214 => "Blank",
 
                 C110 | C111 | C120 | C130 | C140 | C112 | C113 | C114 => "Compound",
             }

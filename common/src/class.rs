@@ -34,6 +34,8 @@ pub enum Class {
     B210,
     B211,
     B212,
+    B213,
+    B214,
     B220,
     B230,
     C110,
@@ -72,6 +74,8 @@ impl Class {
             Class::B220 => "Blank Schüler m/w",
             Class::B230 => "Blank Jugend m/w",
             Class::B212 => "Blank Master m",
+            Class::B213 => "Blank Master w",
+            Class::B214 => "Blank Senioren m",
 
             Class::C110 => "Compound Herren",
             Class::C111 => "Compound Damen",
@@ -113,7 +117,15 @@ impl Class {
         ]
     }
     pub fn barebow_classes() -> &'static [Self] {
-        &[Self::B210, Self::B211, Self::B220, Self::B230, Self::B212]
+        &[
+            Self::B210,
+            Self::B211,
+            Self::B220,
+            Self::B230,
+            Self::B212,
+            Self::B213,
+            Self::B214,
+        ]
     }
     pub fn compound_classes() -> &'static [Self] {
         &[
@@ -156,10 +168,12 @@ impl Class {
             Class::C114 => (66, 120),
 
             Class::B210 => (21, 49),
-            Class::B211 => (21, 120),
+            Class::B211 => (21, 49),
             Class::B220 => (1, 14),
             Class::B230 => (15, 20),
-            Class::B212 => (50, 120),
+            Class::B212 => (50, 65),
+            Class::B213 => (50, 120),
+            Class::B214 => (66, 120),
 
             Class::O => (1, 120),
         };
@@ -198,6 +212,8 @@ impl Class {
             R15 => &[R13, R11],
 
             B212 => &[B210],
+            B213 => &[B211],
+            B214 => &[B210, B212],
 
             C140 => &[C110, C111],
             C112 => &[C110],
