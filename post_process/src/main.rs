@@ -104,6 +104,9 @@ async fn main() {
                     _ => unreachable!(),
                 };
                 ar.target = format!("{}{}", acc.0 / 4, c);
+                if ar.session == 0 {
+                    ar.session = 1;
+                }
                 acc
             });
     }
@@ -130,7 +133,13 @@ async fn main() {
                 );
                 eprintln!("zmi {} vs {}", hits[0].geburtsdatum, dob);
             }
-            arch.bib = hits[0].passnummer;
+            arch.bib = hits[0].passnummer.unwrap_or_else(|| {
+                eprintln!(
+                    "archer {}, {} doesn't have a passnummer",
+                    arch.last_name, arch.first_name
+                );
+                arch.bib
+            });
         } else if hits.len() >= 1 {
             eprintln!(
                 "archer {}, {} appears multiple times in ZMI",
@@ -150,7 +159,7 @@ async fn main() {
             target_face_to_id[additions.target_face.as_ref().unwrap()]
         );
         println!(
-            "##EMAIL##{};{}",
+            "##EMAIL##;{};{}",
             arch.bib,
             additions.email.clone().unwrap_or_default()
         );

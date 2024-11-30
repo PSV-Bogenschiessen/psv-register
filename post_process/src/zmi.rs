@@ -41,11 +41,11 @@ pub struct ZmiArcher {
     #[serde(rename(deserialize = "EINTRITTDSB"))]
     pub eintrittdsb: String,
     #[serde(rename(deserialize = "ERSTVEREINNR"))]
-    pub erstvereinnr: u64,
+    pub erstvereinnr: Option<u64>,
     #[serde(rename(deserialize = "ERSTVEREIN"))]
     pub erstverein: String,
     #[serde(rename(deserialize = "PASSNUMMER"))]
-    pub passnummer: i64,
+    pub passnummer: Option<i64>,
     #[serde(rename(deserialize = "MITGLIEDSJAHREVEREIN"))]
     pub mitgliedsjahreverein: u16,
     #[serde(rename(deserialize = "MITGLIEDSJAHREBSSB"))]
