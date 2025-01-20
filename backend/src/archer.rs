@@ -15,7 +15,7 @@ pub async fn create_archers(
 ) -> Result<impl IntoResponse> {
     // println!("Received {} {}", payload.first_name, payload.last_name);
 
-    if payload.archers.iter().any(|a| [1].contains(&a.session)) {
+    if payload.archers.iter().any(|a| [0, 1].contains(&a.session)) {
         return Ok((
             StatusCode::FORBIDDEN,
             Json("Registration closed").into_response(),
