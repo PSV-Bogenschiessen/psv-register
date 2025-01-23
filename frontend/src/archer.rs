@@ -110,7 +110,7 @@ impl Default for ArcherModel {
             date_of_birth: DoB::Vaild(date),
             bow_type: BowType::Recurve,
             cls: Some(cls),
-            session: 0,
+            session: 2,
             possible_target_faces: TargetFace::for_cls(cls).to_owned(),
             selected_target_face: TargetFace::for_cls(cls)[0],
         }
