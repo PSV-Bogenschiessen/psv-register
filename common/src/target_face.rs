@@ -13,10 +13,10 @@ impl TargetFace {
         use Class::*;
         use TargetFace::*;
         match cls {
-            R20 | C120 | B220 => &[Yellow],
+            R20 | C120 | B220 | C140 => &[Yellow],
             B230 => &[Yellow],
             R30 | C130 => &[Blue],
-            B210 | B211 | B212 => &[Blue],
+            B210 | B211 | B212 | B240 => &[Blue],
             R10 | R11 | R12 | R40 | C110 | C111 | C112 => &[Red],
             OO => &[Yellow],
         }
