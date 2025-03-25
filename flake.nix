@@ -47,6 +47,10 @@
           container = pkgs.dockerTools.buildImage {
             name = "ghcr.io/PSV-Bogenschiessen/psv-register-feld";
             tag = "latest";
+            copyToRoot = pkgs.buildEnv {
+              name = "image-root";
+              paths = [ pkgs.cacert ];
+            };
             config.Cmd = ["${backend}/bin/backend"];
           };
         };
