@@ -44,6 +44,11 @@
           frontend = import nix/frontend.nix { inherit pkgs; };
           backend = import nix/backend.nix { inherit pkgs frontend; };
           default = backend;
+          container = pkgs.dockerTools.buildImage {
+            name = "ghcr.io/PSV-Bogenschiessen/psv-register-feld";
+            tag = "latest";
+            config.Cmd = ["${backend}/bin/backend"];
+          };
         };
 
         formatter = pkgs.nixpkgs-fmt;
