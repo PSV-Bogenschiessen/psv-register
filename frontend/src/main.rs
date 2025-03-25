@@ -5,6 +5,8 @@ use std::{fmt::Display, str::FromStr};
 use chrono::prelude::*;
 use common::{bow_type::BowType, class::Class, target_face::TargetFace};
 use seed::{prelude::*, *};
+use gloo_console::{log, error};
+use gloo_net::http::{Request, Method};
 
 #[derive(Serialize, Deserialize)]
 struct Model {
@@ -121,7 +123,7 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
     });
     let window = window();
     let Some(session_storage) = window.session_storage().ok().flatten() else {
-        seed::log!("Couldn't load session storage");
+        log!("Couldn't load session storage");
         return Model::new();
     };
     if let Some(ser_model) = session_storage.get_item("model").unwrap() {
@@ -133,7 +135,7 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
                 model
             }
             Err(_) => {
-                seed::error!("Failed to load stored session");
+                error!("Failed to load stored session");
                 Model::new()
             }
         }
@@ -165,7 +167,7 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             model.date_of_birth = match chrono::NaiveDate::parse_from_str(&dob, "%Y-%m-%d") {
                 Ok(valid) => valid,
                 Err(e) => {
-                    seed::error!("Date of birth is not valid:", e);
+                    error!("Date of birth is not valid:", e.to_string());
                     Default::default()
                 }
             };
@@ -179,17 +181,17 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             }
         }
         Msg::BowTypeChange(bt) => {
-            seed::log!("Selected bow type", bt);
+            log!("Selected bow type", format!("{:?}", bt));
             model.bow_type = bt;
             model.check_and_update_cls(orders);
         }
         Msg::ClassChanged(cls) => {
-            seed::log!("Selected cls", cls.map(|cls| cls.name()));
+            log!("Selected cls", cls.map(|cls| cls.name()));
             model.cls = cls;
             model.update_target_face();
         }
         Msg::TargetFaceChanged(tf) => {
-            seed::log!("Selected target", tf);
+            log!("Selected target", format!("{:?}", tf));
             model.selected_target_face = tf;
         }
         Msg::Submit => {
@@ -214,14 +216,14 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             seed::window()
                 .alert_with_message(&format!("Fehler! {err:?}"))
                 .ok();
-            seed::error!("Submission failed!", err);
+            error!("Submission failed!", err);
             model.submitting = false;
         }
         Msg::RegistrationOk => {
             seed::window()
                 .alert_with_message("Anmeldung erfolgreich. Bestätigungsmail wurde abgeschickt.")
                 .ok();
-            seed::log!("Submission ok!");
+            log!("Submission ok!");
             *model = Model {
                 mail: model.mail.clone(),
                 ..Model::new()
@@ -361,19 +363,19 @@ fn view(model: &Model) -> Node<Msg> {
 
 async fn post_participant(archer: common::archer::Archer) -> Msg {
     let url = BASE_URL.with(|base| base.borrow().clone().set_path(["api", "archers"]));
-    let request = Request::new(url.to_string())
-        .method(Method::Post)
+    let request = Request::post(&url.to_string())
         .json(&archer)
         .unwrap();
-    let response = match fetch(request).await {
+    let response = match request.send().await {
         Ok(r) => r,
         Err(e) => return Msg::RegistrationFailed(format!("{e:?}")),
     };
     let text = response.text().await;
-    match response.check_status() {
-        Ok(_) => Msg::RegistrationOk,
-        Err(e) => {
-            seed::log!(e);
+    match response.ok() {
+        true => Msg::RegistrationOk,
+        false => {
+            let e = response.status_text();
+            log!(&e);
             Msg::RegistrationFailed(text.unwrap_or(format!("{e:?}")))
         }
     }
