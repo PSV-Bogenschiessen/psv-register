@@ -11,7 +11,7 @@
       let
         overlays = [
           (import rust-overlay)
-          (import nix/overlay.nix)
+          # (import nix/overlay.nix)
         ];
         pkgs = import nixpkgs { inherit system overlays; };
       in
