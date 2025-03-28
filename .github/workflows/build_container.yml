@@ -18,4 +18,4 @@ jobs:
       - name: Upload Container to Registry
         run : |
           docker load < result
-          docker push ghcr.io/psv-bogenschiessen/psv-register-feld:latest
+          docker push ghcr.io/psv-bogenschiessen/psv-register-wa:latest

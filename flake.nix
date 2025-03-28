@@ -50,7 +50,7 @@
           backend = import nix/backend.nix { inherit pkgs frontend; };
           default = backend;
           container = pkgs.dockerTools.buildImage {
-            name = "ghcr.io/PSV-Bogenschiessen/psv-register-feld";
+            name = "ghcr.io/PSV-Bogenschiessen/psv-register-wa";
             tag = "latest";
             copyToRoot = pkgs.buildEnv {
               name = "image-root";
