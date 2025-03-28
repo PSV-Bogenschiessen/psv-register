@@ -57,6 +57,7 @@
               paths = [ pkgs.cacert ];
             };
             config.Cmd = ["${backend}/bin/backend"];
+            config.Env = ["RUST_LOG=info"];
           };
         };
 
