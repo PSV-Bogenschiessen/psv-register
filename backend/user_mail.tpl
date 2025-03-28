@@ -1,6 +1,6 @@
 Hallo {{first_name}},
 
-vielen Dank für deine Anmeldung zur Vereinsmeisterschaft WA am 09.06.2024.
+vielen Dank für deine Anmeldung zur Vereinsmeisterschaft WA am 25.05.2025.
 
 So hast du dich angemeldet:
 Name: {{first_name}} {{last_name}}
