@@ -34,6 +34,7 @@ pub enum Class {
     B230,
     B212,
     B213,
+    B214,
     C110,
     C111,
     C120,
@@ -71,6 +72,7 @@ impl Class {
             Class::B230 => "Blank Jugend m/m",
             Class::B212 => "Blank Master m",
             Class::B213 => "Blank Master w",
+            Class::B214 => "Blank Senioren m",
             Class::C110 => "Compound Herren",
             Class::C111 => "Compound Damen",
             Class::C120 => "Compound Schüler m/w",
@@ -121,6 +123,7 @@ impl Class {
             Self::B230,
             Self::B212,
             Self::B213,
+            Self::B214,
             Self::OO,
         ]
     }
@@ -169,8 +172,9 @@ impl Class {
             Class::B211 => (18, 49),
             Class::B220 => (1, 14),
             Class::B230 => (15, 17),
-            Class::B212 => (50, 120),
+            Class::B212 => (50, 65),
             Class::B213 => (50, 120),
+            Class::B214 => (66, 120),
             Class::OO => (15, 120),
         };
 
