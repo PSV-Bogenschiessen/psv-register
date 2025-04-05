@@ -116,7 +116,7 @@ async fn send_registration_mail(
             "sport@bogen-psv.de".parse().unwrap(),
         ))
         .header(lettre::message::header::ContentType::TEXT_PLAIN)
-        .subject("Anmeldebestätigung Vereinsmeisterschaft Feld")
+        .subject("Anmeldebestätigung Vereinsmeisterschaft WA")
         .body(HANDLEBARS.read().render("user_mail", &email_data).unwrap())
         .unwrap();
 
